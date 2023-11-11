@@ -440,7 +440,23 @@ void simulateYear(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int&
     // Update each cell, according to its neighbors
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
-            // TODO
+            int aliveNeighbors = 0; // The number of alive neighbors
+            for (int offsetX = -1; offsetX <= 1; offsetX++) { // Loop through the neighbors
+                for (int offsetY = -1; offsetY <= 1; offsetY++) {
+                    if (offsetX == 0 && offsetY == 0) { // Skip the current cell
+                        continue;
+                    }
+                    int neighborX = x + offsetX, neighborY = y + offsetY; // The coordinate of the neighbor
+                    if (neighborX < 0 || neighborX >= WIDTH || neighborY < 0 || neighborY >= HEIGHT) { // Skip neighbors outside the board
+                        continue;
+                    }
+                    if (lastBoard[neighborX][neighborY]) { // Check if the neighbor is alive
+                        aliveNeighbors++;
+                    }
+                }
+            }
+            // Update the cell
+            board[x][y] = lastBoard[x][y] ? aliveNeighbors == 2 || aliveNeighbors == 3 : aliveNeighbors == 3;
         }
     }
 
