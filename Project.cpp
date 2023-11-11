@@ -11,6 +11,15 @@ const int MAX_YEARS = 100;
 const int MAX_STAGNANT_YEARS = 20;
 /* #endregion */
 
+/* #region Enums */
+enum GameOfLifeState {
+    RUNNING,
+    STAGNATED,
+    ALL_DEAD,
+    MAX_YEARS_REACHED
+};
+/* #endregion */
+
 /* #region Function Declarations */
 /**
  * Clears the screen, using ANSI escape codes.
@@ -88,6 +97,26 @@ bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]);
  * @return The number of alive cells.
  */
 int aliveCells(bool board[WIDTH][HEIGHT]);
+
+/**
+ * Displays the state of the game of life.
+ * Used for interactive mode.
+ * @param board The board to display.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @param state The state of the game of life.
+ */
+void displayState(bool board[WIDTH][HEIGHT], int years, int stagnantYears, GameOfLifeState state);
+
+
+/**
+ * Detects the current state of the game of life.
+ * @param board The board to check.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @return The state of the game of life.
+ */
+GameOfLifeState detectState(bool board[WIDTH][HEIGHT], int years, int stagnantYears);
 /* #endregion */
 
 /* #region Main */
@@ -255,6 +284,62 @@ void drawBoard(bool board[WIDTH][HEIGHT]) {
 }
 
 /**
+ * Displays the state of the game of life.
+ * Used for interactive mode.
+ * @param board The board to display.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @param state The state of the game of life.
+ */
+void displayState(bool board[WIDTH][HEIGHT], int years, int stagnantYears, GameOfLifeState state) {
+    clearScreen();
+    drawBoard(board);
+    switch (state) {
+        case RUNNING:
+            cout << "  Current year: " << years << endl;
+            break;
+        case STAGNATED:
+            cout << "  Game ended after " << years << " years." << endl
+                << "    (Game stagnated for " << stagnantYears << " years.)" << endl;
+            break;
+        case ALL_DEAD:
+            cout << "  Game ended after " << years << " years." << endl
+                << "    (All cells are dead.)" << endl;
+            break;
+        case MAX_YEARS_REACHED:
+            cout << "  Game ended after " << years << " years." << endl
+                << "    (Maximum number of years reached.)" << endl;
+            break;
+    }
+    cout << endl;
+    pause();
+}
+
+/**
+ * Detects the current state of the game of life.
+ * @param board The board to check.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @return The state of the game of life.
+ */
+GameOfLifeState detectState(bool board[WIDTH][HEIGHT], int years, int stagnantYears) {
+    // Check if the board is empty
+    if (isBoardEmpty(board)) {
+        return ALL_DEAD;
+    }
+    // Check if the board is stagnant for too long
+    else if (stagnantYears >= MAX_STAGNANT_YEARS) {
+        return STAGNATED;
+    }
+    // Check if the maximum number of years has been reached
+    else if (years >= MAX_YEARS) {
+        return MAX_YEARS_REACHED;
+    }
+    // Otherwise, the game is still running
+    return RUNNING;
+}
+
+/**
  * Simulates the Game of Life for a single year.
  * @param board The board to simulate.
  * @param lastBoard The board from the previous year.
@@ -263,40 +348,19 @@ void drawBoard(bool board[WIDTH][HEIGHT]) {
  * @param interactive Whether to display the board after each year.
  */
 void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive) {
-    if (interactive) {
-        clearScreen();
-        drawBoard(board);
-        cout << "  Current year: " << years << endl;
-        pause();
+    GameOfLifeState state = detectState(board, years, stagnantYears);
+
+    if (interactive && state != RUNNING) {
+        displayState(board, years, stagnantYears, state);
+        return;
     }
-    
-    bool isEmpty;
-    while (years < MAX_YEARS && stagnantYears < MAX_STAGNANT_YEARS && !isEmpty) {
+
+    while (state == RUNNING) {
         simulateYear(board, lastBoard, years, stagnantYears);
-        isEmpty = isBoardEmpty(board);
+        state = detectState(board, years, stagnantYears);
         if (interactive) {
-            clearScreen();
-            drawBoard(board);
-            cout << "  Current year: " << years << endl;
-            pause();
+            displayState(board, years, stagnantYears, state);
         }
-    }
-
-    if (interactive) {
-        clearScreen();
-        drawBoard(board);
-        cout << "  Game ended after " << years << " years." << endl;
-        if (isEmpty) {
-            cout << "  All cells are dead." << endl;
-        } else if (stagnantYears >= MAX_STAGNANT_YEARS) {
-            cout << "  Game stagnated for " << stagnantYears << " years." << endl;
-        }
-
-        int alive = aliveCells(board);
-        cout << endl << "  Alive cells: " << alive << endl
-            << "  Dead cells: " << (TOTAL_CELLS - alive) << endl;
-
-        pause();
     }
 }
 
