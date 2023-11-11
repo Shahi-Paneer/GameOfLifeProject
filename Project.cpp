@@ -15,13 +15,15 @@ void pause();
 
 void initializeBoard(bool board[WIDTH][HEIGHT]);
 
-void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years);
+void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears);
 
 void clearInput(bool board[WIDTH][HEIGHT], int& years);
 
 void drawBoard(bool board[WIDTH][HEIGHT]);
 
 void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]);
+
+bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]);
 /* #endregion */
 
 /* #region Main */
@@ -44,6 +46,7 @@ int main() {
     bool lastBoard[WIDTH][HEIGHT];
     initializeBoard(board);
     int years = 0;
+    int stagnantYears = 0;
 
     while (gameActive) {
         clearScreen();
@@ -140,10 +143,8 @@ void clearInput(bool board[WIDTH][HEIGHT], int& years) {
     clearScreen();
     cout << "  Input cleared." << endl;
     drawBoard(board);
-    cout << " Current year: " << years << endl;
+    cout << "  Current year: " << years << endl;
     pause();
-
-    // TODO Stuff
 }
 
 void drawBoard(bool board[WIDTH][HEIGHT]) {
@@ -164,7 +165,7 @@ void drawBoard(bool board[WIDTH][HEIGHT]) {
     cout << "+" << string(WIDTH, '-') << "+" << endl;   
 }
 
-void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years) {
+void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears) {
     copyBoard(board, lastBoard);
 
     for (int x = 0; x < WIDTH; x++) {
@@ -174,6 +175,24 @@ void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& yea
     }
 
     years++;
+    if (boardChanged(board, lastBoard)) {
+        stagnantYears = 0;
+    }
+    else {
+        stagnantYears++;
+    }
+}
+
+bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]) {
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            if (board[x][y] != lastBoard[x][y]) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 /* #endregion */
