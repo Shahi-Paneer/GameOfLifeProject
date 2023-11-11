@@ -7,83 +7,93 @@ using namespace std;
 int main()
 {
 
-
-// git add .
-// git commmit -m "insert message here"
-// git push
-
+    // Constants for file information
     const string FILE_NAME = "intialSetup.csv";
-    const int FILE_LENGTH = 4;
-    const int FILE_LINE_LENGTH = 5;
+    const int FILE_LENGTH = 4;      // Number of rows in the game board
+    const int FILE_LINE_LENGTH = 5; // Number of columns in the game board
 
+    // 2D array to store the initial state of the Game of Life
     int gameBoard[FILE_LENGTH][FILE_LINE_LENGTH];
 
-    ifstream csvReader(FILE_NAME);
-    string myText;
+    //check if the file provieded by the user exists
+    ifstream checkFile(FILE_NAME);
 
-    int fileLength = 0;
-
-    stringstream s("myText");
-    while (getline(csvReader, myText))
+    //if the file exists continue if not report out error message
+    if (checkFile.good() == true)
     {
-        // Output the text from the file
-        cout << myText;
-        
 
-        stringstream lineParser(myText);
+        // Open the CSV file for reading
+        ifstream csvReader(FILE_NAME);
+        string myText;
 
-        int lineLength = 0;
+        // Variable to track the current line being read in the CSV file
+        int fileLength = 0;
 
-        bool valueError = false;
-
-        while (lineParser.good())
+        // Process each line of the CSV file
+        while (getline(csvReader, myText))
         {
+            // Parse the current line using a stringstream
+            stringstream lineParser(myText);
 
-            string val;
-            getline(lineParser, val, ',');
+            // Variable to track the length of the current line
+            int lineLength = 0;
 
-            cout << endl
-                 << val << endl;
-                 
-            if (stoi(val) == 0 || stoi(val) == 1)
+            // Flag to indicate if there's an error in the current line
+            bool valueError = false;
+
+            // Process each value in the current line
+            while (lineParser.good())
             {
-                gameBoard[fileLength][lineLength] = stoi(val);
+                string val;
+                // Get a value separated by a comma
+                getline(lineParser, val, ',');
+
+                // Check if the value is either 0 or 1 and update the game board
+                if (stoi(val) == 0 || stoi(val) == 1)
+                {
+                    gameBoard[fileLength][lineLength] = stoi(val);
+                }
+                else
+                {
+                    // Set an error flag if the value is not 0 or 1
+                    valueError = true;
+                    break;
+                }
+
+                // Move to the next position in the line
+                lineLength++;
             }
-            else
+
+            // Check for errors in the current line
+            if (valueError == true)
             {
-                valueError = true;
-                break;
-
+                cout << "ERROR: Line " << fileLength << " character " << lineLength << " does not have a valid value of 0 or 1!";
+                break; // Exit the loop if an error is encountered
             }
-            lineLength++;
+            else if (lineLength != FILE_LINE_LENGTH)
+            {
+                cout << "ERROR: Line " << fileLength << " does not have " << FILE_LINE_LENGTH << " values!";
+                break; // Exit the loop if the line length is incorrect
+            }
+
+            // Move to the next line in the file
+            fileLength++;
         }
 
-
-
-        if (valueError == true)
+        // Display the populated game board (for debugging purposes)
+        cout << "Initial Game Board:" << endl;
+        for (int i = 0; i < FILE_LENGTH; i++)
         {
-            cout << "ERROR: Line " << fileLength << " charector " << lineLength << " does not have a valid value of 0 or 1!";
-            break;
+            for (int j = 0; j < FILE_LINE_LENGTH; j++)
+            {
+                cout << gameBoard[i][j] << ", ";
+            }
+            cout << endl;
         }
-        else if (lineLength != FILE_LINE_LENGTH)
-        {
-            cout << "ERROR: Line " << fileLength << " does not have " << FILE_LINE_LENGTH << " values!";
-            break;
-        }
-
-        fileLength++;
     }
-
-    cout << endl
-         << endl;
-
-    for (int i = 0; i < FILE_LENGTH; i++)
+    else
     {
-        for (int j = 0; j < FILE_LINE_LENGTH; j++)
-        {
 
-            cout << gameBoard[i][j] << ", ";
-        }
-        cout << endl;
+        cout << "ERROR: File " << FILE_NAME << " does not exist!";
     }
 }
