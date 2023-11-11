@@ -13,12 +13,12 @@ int main()
     const int FILE_LINE_LENGTH = 5; // Number of columns in the game board
 
     // 2D array to store the initial state of the Game of Life
-    int gameBoard[FILE_LENGTH][FILE_LINE_LENGTH];
+    bool gameBoard[FILE_LENGTH][FILE_LINE_LENGTH];
 
-    //check if the file provieded by the user exists
+    // check if the file provieded by the user exists
     ifstream checkFile(FILE_NAME);
 
-    //if the file exists continue if not report out error message
+    // if the file exists continue if not report out error message
     if (checkFile.good() == true)
     {
 
@@ -48,10 +48,14 @@ int main()
                 // Get a value separated by a comma
                 getline(lineParser, val, ',');
 
-                // Check if the value is either 0 or 1 and update the game board
-                if (stoi(val) == 0 || stoi(val) == 1)
+                // Check if the value is either 0 or 1 and update the game board storing info as a bool
+                if (stoi(val) == 0)
                 {
-                    gameBoard[fileLength][lineLength] = stoi(val);
+                    gameBoard[fileLength][lineLength] = false;
+                }
+                else if (stoi(val) == 1)
+                {
+                    gameBoard[fileLength][lineLength] = true;
                 }
                 else
                 {
@@ -86,6 +90,10 @@ int main()
         {
             for (int j = 0; j < FILE_LINE_LENGTH; j++)
             {
+                int output = 0;
+                if (gameBoard[i][j] == true) {
+                    output = 1;
+                }
                 cout << gameBoard[i][j] << ", ";
             }
             cout << endl;
