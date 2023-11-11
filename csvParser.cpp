@@ -30,7 +30,7 @@ int main()
         int fileLength = 0;
 
         // Process each line of the CSV file
-        while (getline(csvReader, myText))
+        while (getline(csvReader, myText) && fileLength <= 3)
         {
             // Parse the current line using a stringstream
             stringstream lineParser(myText);
@@ -49,6 +49,7 @@ int main()
                 getline(lineParser, val, ',');
 
                 // Check if the value is either 0 or 1 and update the game board storing info as a bool
+                cout << fileLength << endl;
                 if (stoi(val) == 0)
                 {
                     gameBoard[fileLength][lineLength] = false;
