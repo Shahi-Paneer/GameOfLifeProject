@@ -15,6 +15,8 @@ void pause();
 
 void initializeBoard(bool board[WIDTH][HEIGHT]);
 
+void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years);
+
 void clearInput(bool board[WIDTH][HEIGHT], int& years);
 
 void drawBoard(bool board[WIDTH][HEIGHT]);
@@ -160,6 +162,18 @@ void drawBoard(bool board[WIDTH][HEIGHT]) {
         cout << "|" << endl;
     }
     cout << "+" << string(WIDTH, '-') << "+" << endl;   
+}
+
+void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years) {
+    copyBoard(board, lastBoard);
+
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            // TODO
+        }
+    }
+
+    years++;
 }
 
 /* #endregion */
