@@ -10,6 +10,16 @@ const int HEIGHT = 50;
 
 /* #region Function Declarations */
 void clearScreen();
+
+void pause();
+
+void initializeBoard(bool board[WIDTH][HEIGHT]);
+
+void clearInput(bool board[WIDTH][HEIGHT], int& years);
+
+void drawBoard(bool board[WIDTH][HEIGHT]);
+
+void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]);
 /* #endregion */
 
 /* #region Main */
@@ -28,6 +38,11 @@ void clearScreen();
 */
 int main() {
     bool gameActive = true;
+    bool board[WIDTH][HEIGHT];
+    bool lastBoard[WIDTH][HEIGHT];
+    initializeBoard(board);
+    int years = 0;
+
     while (gameActive) {
         clearScreen();
         cout << endl
@@ -51,7 +66,7 @@ int main() {
             cout << endl;
 
             if (choice == 1) {
-                cout << "  Clearing input..." << endl;
+                clearInput(board, years);
                 break;
             }
             else if (choice == 2) {
@@ -92,6 +107,59 @@ int main() {
 /* #region Function Definitions */
 void clearScreen() {
     cout << "\033[2J\033[1;1H" << flush;
+}
+
+void pause() {
+    cout << "Press RETURN to continue..." << flush;
+    cin.ignore();
+    cin.get();
+}
+
+void initializeBoard(bool board[WIDTH][HEIGHT]) {
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            board[x][y] = false;
+        }
+    }
+}
+
+void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]) {
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            to[x][y] = from[x][y];
+        }
+    }
+}
+
+void clearInput(bool board[WIDTH][HEIGHT], int& years) {
+    initializeBoard(board);
+    years = 0;
+
+    clearScreen();
+    cout << "  Input cleared." << endl;
+    drawBoard(board);
+    cout << " Current year: " << years << endl;
+    pause();
+
+    // TODO Stuff
+}
+
+void drawBoard(bool board[WIDTH][HEIGHT]) {
+    cout << "+" << string(WIDTH, '-') << "+" << endl;
+    for (int y = 0; y < HEIGHT; y++) {
+        cout << "|";
+
+        for (int x = 0; x < WIDTH; x++) {
+            if (board[x][y]) {
+                cout << "%";
+            }
+            else {
+                cout << " ";
+            }
+        }
+        cout << "|" << endl;
+    }
+    cout << "+" << string(WIDTH, '-') << "+" << endl;   
 }
 
 /* #endregion */
