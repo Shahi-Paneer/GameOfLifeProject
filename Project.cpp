@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <random>
 using namespace std;
 /* #endregion */
 
@@ -16,6 +17,10 @@ const int WIDTH = 50;
  * The height of the board.
  */
 const int HEIGHT = 50;
+
+//declare constants for the probability
+const double PROB_MAX = 1.0; 
+const double PROB_MIN = 0.0; 
 
 /**
  * The total number of cells on the board.
@@ -73,6 +78,9 @@ void pause();
  * @param board The board to initialize.
  */
 void initializeBoard(bool board[WIDTH][HEIGHT]);
+
+//
+void initializeRandomGrid (double userProbability, bool board[WIDTH][HEIGHT]);
 
 /**
  * Simulates the Game of Life for a single year.
@@ -239,6 +247,55 @@ int main() {
             } else if (choice == 5) {
                 // 5. Random play
                 cout << "  Random play..." << endl;
+                   
+    //declare variables for the program
+
+    int randomPlayTimes;
+    double aliveProbability;
+
+    //get user input for the number of times to play the random play
+    cout << "You chose a random play. Please enter a number of times to play the game. " ;
+    cin >> randomPlayTimes;
+
+    //validate input for the times to play the random play 
+    while (randomPlayTimes <= 0)
+    {
+        cout << "Invalid input, please enter a positive integer. " ;
+        cin >> randomPlayTimes;
+    }
+
+    //get user input for the probability of a cell being alive
+    cout << "Please enter a probability for a cell to be alive," << endl;
+    cout << "e.g. 0.5 to say that each cell has a 50/50 shot to start as alive. " ;
+    cin >> aliveProbability;
+
+    //validate input for the probability of a cell being alive
+    while (aliveProbability < PROB_MIN || aliveProbability > PROB_MAX)
+    {
+        cout << "Invalid input, please enter a number between 0 and 1. " ;
+        cin >> aliveProbability;
+    }
+    
+    //loop through the number of random play iterations
+    for (int play = 0; play < randomPlayTimes; play++)
+    {   
+        //call the function to initialize the board with random values based on user probability input
+        initializeRandomGrid(aliveProbability, board);
+
+        /*
+        //display random board states
+        cout << "Initial grid for play " << play + 1 << ":" << endl;
+        for (int i = 0; i < ROWS; ++i) 
+        {
+            for (int j = 0; j < COLS; ++j) 
+            {
+                cout << grid[i][j] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+        */
+    }
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
@@ -256,6 +313,8 @@ int main() {
         }
     }
     
+    
+
     return 0;
 }
 /* #endregion */
@@ -612,5 +671,24 @@ bool isBoardEmpty(bool board[WIDTH][HEIGHT]) {
     }
     return true;
 }
+
+//the function to initialize the board with random values based on user probability input
+void initializeRandomGrid (double userProbability, bool board[WIDTH][HEIGHT])
+{
+    //initialize random number generator
+    random_device myEngine;
+    //create a number between 0.0 and 1.0
+    uniform_real_distribution<double> randomNum(PROB_MIN, PROB_MAX);
+
+    for (int x = 0; x < WIDTH; ++x) 
+    {
+        for (int y = 0; y < HEIGHT; ++y) 
+        {
+            double cellResult = randomNum(myEngine);
+            board[x][y] = (cellResult < userProbability);
+        }
+    }
+}
+
 
 /* #endregion */
