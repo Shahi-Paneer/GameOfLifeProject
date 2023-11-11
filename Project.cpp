@@ -12,26 +12,81 @@ const int MAX_STAGNANT_YEARS = 20;
 /* #endregion */
 
 /* #region Function Declarations */
+/**
+ * Clears the screen, using ANSI escape codes.
+ */
 void clearScreen();
 
+/**
+ * Pauses the program until the user presses Return.
+ */
 void pause();
 
+/**
+ * Initializes the board to all dead cells.
+ * @param board The board to initialize.
+ */
 void initializeBoard(bool board[WIDTH][HEIGHT]);
 
+/**
+ * Simulates the Game of Life for a single year.
+ * @param board The board to simulate.
+ * @param lastBoard The board from the previous year.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @param interactive Whether to display the board after each year.
+ */
 void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive);
 
+/**
+ * Simulates a single year of the Game of Life.
+ * @param board The board to simulate.
+ * @param lastBoard The board from the previous year.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ */
 void simulateYear(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears);
 
+/**
+ * Clears the input, setting the board to all dead cells and the current year to 0.
+ * @param board The board to clear.
+ * @param years The current year.
+ */
 void clearInput(bool board[WIDTH][HEIGHT], int& years);
 
+/**
+ * Draws the board to the console.
+ * @param board The board to draw.
+ */
 void drawBoard(bool board[WIDTH][HEIGHT]);
 
+/**
+ * Copies the contents of one board to another.
+ * @param from The board to copy from.
+ * @param to The board to copy to.
+ */
 void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]);\
 
+/**
+ * Checks if the board is empty.
+ * @param board The board to check.
+ * @return Whether the board is empty.
+ */
 bool isBoardEmpty(bool board[WIDTH][HEIGHT]);
 
+/**
+ * Checks if the board has changed from the previous year.
+ * @param board The board to check.
+ * @param lastBoard The board from the previous year.
+ * @return Whether the board has changed.
+ */
 bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]);
 
+/**
+ * Counts the number of alive cells on the board.
+ * @param board The board to check.
+ * @return The number of alive cells.
+ */
 int aliveCells(bool board[WIDTH][HEIGHT]);
 /* #endregion */
 
@@ -119,16 +174,27 @@ int main() {
 /* #endregion */
 
 /* #region Function Definitions */
+/**
+ * Clears the screen, using ANSI escape codes.
+ * https://stackoverflow.com/questions/4062045/clearing-terminal-in-linux-with-c-code
+ */
 void clearScreen() {
     cout << "\033[2J\033[1;1H" << flush;
 }
 
+/**
+ * Pauses the program until the user presses Return.
+ */
 void pause() {
     cout << "Press RETURN to continue..." << flush;
     cin.ignore();
     cin.get();
 }
 
+/**
+ * Initializes the board to all dead cells.
+ * @param board The board to initialize.
+ */
 void initializeBoard(bool board[WIDTH][HEIGHT]) {
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -137,6 +203,11 @@ void initializeBoard(bool board[WIDTH][HEIGHT]) {
     }
 }
 
+/**
+ * Copies the contents of one board to another.
+ * @param from The board to copy from.
+ * @param to The board to copy to.
+ */
 void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]) {
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -145,6 +216,11 @@ void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]) {
     }
 }
 
+/**
+ * Clears the input, setting the board to all dead cells and the current year to 0.
+ * @param board The board to clear.
+ * @param years The current year.
+ */
 void clearInput(bool board[WIDTH][HEIGHT], int& years) {
     initializeBoard(board);
     years = 0;
@@ -156,6 +232,10 @@ void clearInput(bool board[WIDTH][HEIGHT], int& years) {
     pause();
 }
 
+/**
+ * Draws the board to the console.
+ * @param board The board to draw.
+ */
 void drawBoard(bool board[WIDTH][HEIGHT]) {
     cout << "+" << string(WIDTH, '-') << "+" << endl;
     for (int y = 0; y < HEIGHT; y++) {
@@ -174,6 +254,14 @@ void drawBoard(bool board[WIDTH][HEIGHT]) {
     cout << "+" << string(WIDTH, '-') << "+" << endl;   
 }
 
+/**
+ * Simulates the Game of Life for a single year.
+ * @param board The board to simulate.
+ * @param lastBoard The board from the previous year.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @param interactive Whether to display the board after each year.
+ */
 void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive) {
     if (interactive) {
         clearScreen();
@@ -212,6 +300,13 @@ void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& yea
     }
 }
 
+/**
+ * Simulates a single year of the Game of Life.
+ * @param board The board to simulate.
+ * @param lastBoard The board from the previous year.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ */
 void simulateYear(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears) {
     copyBoard(board, lastBoard);
 
@@ -230,6 +325,12 @@ void simulateYear(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int&
     }
 }
 
+/**
+ * Checks if the board has changed from the previous year.
+ * @param board The board to check.
+ * @param lastBoard The board from the previous year.
+ * @return Whether the board has changed.
+ */
 bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]) {
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
@@ -242,6 +343,11 @@ bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]) {
     return false;
 }
 
+/**
+ * Counts the number of alive cells on the board.
+ * @param board The board to check.
+ * @return The number of alive cells.
+ */
 int aliveCells(bool board[WIDTH][HEIGHT]) {
     int alive = 0;
 
@@ -256,6 +362,11 @@ int aliveCells(bool board[WIDTH][HEIGHT]) {
     return alive;
 }
 
+/**
+ * Checks if the board is empty.
+ * @param board The board to check.
+ * @return Whether the board is empty.
+ */
 bool isBoardEmpty(bool board[WIDTH][HEIGHT]) {
     for (int x = 0; x < WIDTH; x++) {
         for (int y = 0; y < HEIGHT; y++) {
