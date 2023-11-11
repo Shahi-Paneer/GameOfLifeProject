@@ -28,7 +28,7 @@ void drawBoard(bool board[WIDTH][HEIGHT]);
 
 void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]);\
 
-bool emptyBoard(bool board[WIDTH][HEIGHT]);
+bool isBoardEmpty(bool board[WIDTH][HEIGHT]);
 
 bool boardChanged(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT]);
 
@@ -88,7 +88,7 @@ int main() {
                 break;
             }
             else if (choice == 3) {
-                cout << "  Playing the Game of Life..." << endl;
+                simulate(board, lastBoard, years, stagnantYears, true);
                 break;
             }
             else if (choice == 4) {
@@ -175,14 +175,40 @@ void drawBoard(bool board[WIDTH][HEIGHT]) {
 }
 
 void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive) {
-    while (years < MAX_YEARS && stagnantYears < MAX_STAGNANT_YEARS && !emptyBoard(board)) {
+    if (interactive) {
+        clearScreen();
+        drawBoard(board);
+        cout << "  Current year: " << years << endl;
+        pause();
+    }
+    
+    bool isEmpty;
+    while (years < MAX_YEARS && stagnantYears < MAX_STAGNANT_YEARS && !isEmpty) {
         simulateYear(board, lastBoard, years, stagnantYears);
+        isEmpty = isBoardEmpty(board);
         if (interactive) {
             clearScreen();
             drawBoard(board);
             cout << "  Current year: " << years << endl;
             pause();
         }
+    }
+
+    if (interactive) {
+        clearScreen();
+        drawBoard(board);
+        cout << "  Game ended after " << years << " years." << endl;
+        if (isEmpty) {
+            cout << "  All cells are dead." << endl;
+        } else if (stagnantYears >= MAX_STAGNANT_YEARS) {
+            cout << "  Game stagnated for " << stagnantYears << " years." << endl;
+        }
+
+        int alive = aliveCells(board);
+        cout << endl << "  Alive cells: " << alive << endl
+            << "  Dead cells: " << (TOTAL_CELLS - alive) << endl;
+
+        pause();
     }
 }
 
@@ -228,6 +254,17 @@ int aliveCells(bool board[WIDTH][HEIGHT]) {
     }
 
     return alive;
+}
+
+bool isBoardEmpty(bool board[WIDTH][HEIGHT]) {
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            if (board[x][y]) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 /* #endregion */
