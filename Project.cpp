@@ -1,9 +1,11 @@
 /* #region Includes */
-#include<iostream>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <random>
+#include <vector>
+#include <cctype>
 using namespace std;
 /* #endregion */
 
@@ -38,7 +40,32 @@ const int MAX_YEARS = 100;
 const int MAX_STAGNANT_YEARS = 20;
 /* #endregion */
 
-/* #region Enums */
+/* #region Structs and Enums */
+
+// NOTE: I (Anna) used this struct because we will need to extract a lot of data
+// in a lot of different places, and it will be easier to do that if we have a
+// struct to centralize all of the data.
+/**
+ * Statistics collector for the Game of Life.
+ * Used to store statistics for each game played.
+ */
+struct Statistics {
+   /**
+    * How many years each game played so far has taken for its completion.
+    */
+    vector<int> endYears;
+
+    // NOTE: This part is not trivial for me (Anna) because the description is not clear enough.
+    // Ask the professor for clarification.
+    /*
+    Report of, on average, how many cells survive the game of life,
+    and how many years it takes, for every game played so far (including random play)
+    */
+   // Average at the end of each game? or at each year?
+   // How many cells survive from the beginning of the game? or at each year? or at the end of each game?
+   // Do we have to track % of total vs alive cells? or just the number of alive cells?
+};
+
 /**
  * The state of the game of life.
  */
@@ -92,16 +119,18 @@ void randomizeBoard(double aliveChance, bool board[WIDTH][HEIGHT]);
  * @param lastBoard The board from the previous year.
  * @param years The current year.
  * @param stagnantYears The number of years the board has been stagnant.
+ * @param stats The statistics collector for the Game of Life.
  * @param interactive Whether to display the board after each year.
  */
-void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive);
+void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, Statistics& stats, bool interactive);
 
 /**
  * Parses an input Game of Life CSV file and loads it into the given board.
  * @param fileName The name of the file to load.
  * @param board The board to load the file into.
+ * @return Whether the file was parsed successfully.
 */
-void parseCsv(string fileName, bool board[WIDTH][HEIGHT]);
+bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]);
 
 /**
  * Simulates a single year of the Game of Life.
@@ -173,8 +202,9 @@ void displayState(bool board[WIDTH][HEIGHT], int years, int stagnantYears, GameO
  * @param lastBoard The board from the previous year.
  * @param years The current year.
  * @param stagnantYears The number of years the board has been stagnant.
+ * @param stats The statistics collector for the Game of Life.
  */
-void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears);
+void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, Statistics& stats);
 
 /**
  * Detects the current state of the game of life.
@@ -210,6 +240,9 @@ int main() {
 
     // The board from the previous year (used to detect when the board is stagnant)
     bool lastBoard[WIDTH][HEIGHT];
+
+    // Statistics collector for the Game of Life
+    Statistics stats;
 
     // Initialize the boards
     initializeBoard(board);
@@ -260,7 +293,7 @@ int main() {
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
-                simulate(board, lastBoard, years, stagnantYears, true);
+                simulate(board, lastBoard, years, stagnantYears, stats, true);
                 break;
             } else if (choice == 4) {
                 // 4. Report summary statistics
@@ -269,7 +302,7 @@ int main() {
                 break;
             } else if (choice == 5) {
                 // 5. Random play
-                randomPlayRoutine(board, lastBoard, years, stagnantYears);
+                randomPlayRoutine(board, lastBoard, years, stagnantYears, stats);
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
@@ -301,7 +334,17 @@ void clearScreen() {
     cout << "\033[2J\033[1;1H" << flush;
 }
 
-void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears) {
+/**
+ * Routine for random play.
+ * The main function passes off the interactive control to this function.
+ * 
+ * @param board The board to simulate.
+ * @param lastBoard The board from the previous year.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ * @param stats The statistics collector for the Game of Life.
+ */
+void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, Statistics& stats) {
     // Variables to store user input
     int randomPlayTimes;
     double aliveChance;
@@ -341,7 +384,7 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
         years = 0;
         stagnantYears = 0;
 
-        simulate(board, lastBoard, years, stagnantYears, false);
+        simulate(board, lastBoard, years, stagnantYears, stats, false);
         // TODO: Statistics thing
     }
 }
@@ -483,9 +526,10 @@ GameOfLifeState detectState(bool board[WIDTH][HEIGHT], int years, int stagnantYe
  * @param lastBoard The board from the previous year.
  * @param years The current year.
  * @param stagnantYears The number of years the board has been stagnant.
+ * @param stats The statistics collector for the Game of Life.
  * @param interactive Whether to display the board after each year.
  */
-void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive) {
+void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, Statistics& stats, bool interactive) {
     // Detect the initial state of the game
     GameOfLifeState state = detectState(board, years, stagnantYears);
 
@@ -505,73 +549,109 @@ void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& yea
         if (interactive) {
             displayState(board, years, stagnantYears, state);
         }
+        // TODO: Statistics thing
     }
 }
+
 /**
  * Parses an input Game of Life CSV file and loads it into the given board.
  * @param fileName The name of the file to load.
  * @param board The board to load the file into.
+ * @return Whether the file was parsed successfully.
 */
-void parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
-    // check if the file provided by the user exists
-    ifstream checkFile(fileName);
+bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
+    ifstream csvReader(fileName); // Reader for the CSV file
 
-    // if the file exists continue if not report out error message
-    if (checkFile.good()) {
-        // Open the CSV file for reading
-        ifstream csvReader(fileName);
-        string myText;
-
-        // Variable to track the current line being read in the CSV file
-        int fileLength = 0;
-
-        // Process each line of the CSV file
-        while (getline(csvReader, myText) && fileLength <= HEIGHT) {
-            // Parse the current line using a stringstream
-            stringstream lineParser(myText);
-
-            // Variable to track the length of the current line
-            int lineLength = 0;
-
-            // Flag to indicate if there's an error in the current line
-            bool valueError = false;
-
-            // Process each value in the current line
-            while (lineParser.good() && fileLength <= (HEIGHT - 1)) {
-                string valueString;
-                // Get a value separated by a comma
-                getline(lineParser, valueString, ',');
-
-                // Check if the value is either 0 or 1 and update the game board storing info as a bool
-                if (stoi(valueString) == 0) {
-                    board[fileLength][lineLength] = false;
-                } else if (stoi(valueString) == 1) {
-                    board[fileLength][lineLength] = true;
-                } else {
-                    // Set an error flag if the value is not 0 or 1
-                    valueError = true;
-                    break;
-                }
-
-                // Move to the next position in the line
-                lineLength++;
-            }
-
-            // Check for errors in the current line
-            if (valueError == true) {
-                cout << "ERROR: Line " << fileLength << " character " << lineLength << " does not have a valid value of 0 or 1!";
-                break; // Exit the loop if an error is encountered
-            } else if (lineLength != WIDTH) {
-                cout << "ERROR: Line " << fileLength << " does not have " << WIDTH << " values!";
-                break; // Exit the loop if the line length is incorrect
-            }
-
-            // Move to the next line in the file
-            fileLength++;
-        }
-    } else {
+    if (!csvReader.good()) { // Check if the file exists
         cout << "ERROR: File " << fileName << " does not exist!";
+        return;
     }
+
+    string csvLine; // Variable to store the current line of the CSV file
+    int boardX = 0, boardY = 0; // Variables to track the current position on the board
+    bool error = false; // Flag to indicate if there's an error in the file
+
+    // Process each line of the CSV file
+    while (!error && boardY < HEIGHT && getline(csvReader, csvLine)) {
+        // Parse the current line using a stringstream
+        stringstream lineParser(csvLine);
+
+        boardX = 0; // Reset the X position
+
+        // Process each value in the current line
+        while (!error && boardX < WIDTH && lineParser.good()) {
+            string valueString;
+            // Get a value separated by a comma
+            getline(lineParser, valueString, ',');
+
+            // Check if the value is empty
+            if (valueString.empty()) {
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a value!";
+                error = true; // Set the error flag
+                break;
+            }
+
+            // Check if the value is longer than 1 character
+            if (valueString.length() > 1) {
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") has a value longer than 1 character!";
+                error = true; // Set the error flag
+                break;
+            }
+
+            // Check if the value is not a digit
+            if (!isdigit(valueString[0])) {
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value!";
+                error = true; // Set the error flag
+                break;
+            }
+
+            int value = stoi(valueString); // Convert the value to an int
+
+            // Check if the value is not 0 or 1
+            if (value != 0 && value != 1) {
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value of 0 or 1!";
+                error = true; // Set the error flag
+                break;
+            }
+
+            board[boardX][boardY] = (value == 1); // Store the value as a bool
+
+            boardX++; // Move to the next position in the line
+        }
+
+        // Check if not enough values were read in the line
+        if (boardX != WIDTH) {
+            cout << "ERROR: Line " << boardY << " does not have " << WIDTH << " values!";
+            error = true; // Set the error flag
+            break;
+        }
+        
+        // Check if there are more values to be read in the line
+        if (!lineParser.eof()) {
+            // There are more values in the line than expected
+            cout << "ERROR: Line " << boardY << " has more than " << WIDTH << " values!";
+            error = true; // Set the error flag
+            break;
+        }
+
+        // Move to the next line in the file
+        boardY++;
+    }
+
+    // Check if not enough lines were read in the file
+    if (boardY != HEIGHT) {
+        cout << "ERROR: File does not have " << HEIGHT << " lines!";
+        error = true; // Set the error flag
+    }
+
+    // Check if there are more lines to be read in the file
+    if (!csvReader.eof()) {
+        // There are more lines in the file than expected
+        cout << "ERROR: File has more than " << HEIGHT << " lines!";
+        error = true; // Set the error flag
+    }
+
+    return !error; // Return whether there was an error
 }
 
 /**
