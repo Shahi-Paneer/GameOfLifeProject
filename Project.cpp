@@ -79,8 +79,12 @@ void pause();
  */
 void initializeBoard(bool board[WIDTH][HEIGHT]);
 
-//
-void initializeRandomGrid (double userProbability, bool board[WIDTH][HEIGHT]);
+/**
+ * Randomizes the board to a random state.
+ * @param aliveChance The chance that any given cell is alive, between 0 and 1.
+ * @param board The board to randomize.
+ */
+void randomizeBoard(double aliveChance, bool board[WIDTH][HEIGHT]);
 
 /**
  * Simulates the Game of Life for a single year.
@@ -92,7 +96,12 @@ void initializeRandomGrid (double userProbability, bool board[WIDTH][HEIGHT]);
  */
 void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears, bool interactive);
 
-void csvParse(string fileName, int gridX, int gridY);
+/**
+ * Parses an input Game of Life CSV file and loads it into the given board.
+ * @param fileName The name of the file to load.
+ * @param board The board to load the file into.
+*/
+void parseCsv(string fileName, bool board[WIDTH][HEIGHT]);
 
 /**
  * Simulates a single year of the Game of Life.
@@ -157,6 +166,17 @@ void displayState(bool board[WIDTH][HEIGHT], int years, int stagnantYears, GameO
 
 
 /**
+ * Routine for random play.
+ * The main function passes off the interactive control to this function.
+ * 
+ * @param board The board to simulate.
+ * @param lastBoard The board from the previous year.
+ * @param years The current year.
+ * @param stagnantYears The number of years the board has been stagnant.
+ */
+void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears);
+
+/**
  * Detects the current state of the game of life.
  * @param board The board to check.
  * @param years The current year.
@@ -164,6 +184,7 @@ void displayState(bool board[WIDTH][HEIGHT], int years, int stagnantYears, GameO
  * @return The state of the game of life.
  */
 GameOfLifeState detectState(bool board[WIDTH][HEIGHT], int years, int stagnantYears);
+
 /* #endregion */
 
 /* #region Main */
@@ -235,6 +256,7 @@ int main() {
             } else if (choice == 2) {
                 // 2. Set state from CSV file
                 cout << "  Setting state from CSV file..." << endl;
+                // TODO: Implement this
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
@@ -243,63 +265,16 @@ int main() {
             } else if (choice == 4) {
                 // 4. Report summary statistics
                 cout << "  Reporting summary statistics..." << endl;
+                // TODO: Implement this
                 break;
             } else if (choice == 5) {
                 // 5. Random play
-                cout << "  Random play..." << endl;
-                   
-    //declare variables for the program
-
-    int randomPlayTimes;
-    double aliveProbability;
-
-    //get user input for the number of times to play the random play
-    cout << "You chose a random play. Please enter a number of times to play the game. " ;
-    cin >> randomPlayTimes;
-
-    //validate input for the times to play the random play 
-    while (randomPlayTimes <= 0)
-    {
-        cout << "Invalid input, please enter a positive integer. " ;
-        cin >> randomPlayTimes;
-    }
-
-    //get user input for the probability of a cell being alive
-    cout << "Please enter a probability for a cell to be alive," << endl;
-    cout << "e.g. 0.5 to say that each cell has a 50/50 shot to start as alive. " ;
-    cin >> aliveProbability;
-
-    //validate input for the probability of a cell being alive
-    while (aliveProbability < PROB_MIN || aliveProbability > PROB_MAX)
-    {
-        cout << "Invalid input, please enter a number between 0 and 1. " ;
-        cin >> aliveProbability;
-    }
-    
-    //loop through the number of random play iterations
-    for (int play = 0; play < randomPlayTimes; play++)
-    {   
-        //call the function to initialize the board with random values based on user probability input
-        initializeRandomGrid(aliveProbability, board);
-
-        /*
-        //display random board states
-        cout << "Initial grid for play " << play + 1 << ":" << endl;
-        for (int i = 0; i < ROWS; ++i) 
-        {
-            for (int j = 0; j < COLS; ++j) 
-            {
-                cout << grid[i][j] << " ";
-            }
-            cout << endl;
-        }
-        cout << endl;
-        */
-    }
+                randomPlayRoutine(board, lastBoard, years, stagnantYears);
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
                 cout << "  Outputting histogram..." << endl;
+                // TODO: Implement this
                 break;
             } else if (choice == 7) {
                 // 7. Quit
@@ -313,8 +288,6 @@ int main() {
         }
     }
     
-    
-
     return 0;
 }
 /* #endregion */
@@ -326,6 +299,51 @@ int main() {
  */
 void clearScreen() {
     cout << "\033[2J\033[1;1H" << flush;
+}
+
+void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& years, int& stagnantYears) {
+    // Variables to store user input
+    int randomPlayTimes;
+    double aliveChance;
+
+    // Prompt the user for input
+    while (true) {
+        cout << "Please enter a number of times of random play to occur:" << endl;
+        cin >> randomPlayTimes;
+
+        if (randomPlayTimes > 0) {
+            break;
+        }
+
+        cout << "Invalid input: The number of times to play must greater than 0." << endl;
+    }
+    
+    // Prompt the user for input
+    while (true) {
+        // cout << "Please enter a probability for a cell to be alive," << endl;
+        // cout << "e.g. 0.5 to say that each cell has a 50/50 shot to start as alive. " ;
+        cout << "Please enter a probability for a cell to be alive:" << endl;
+        cout << "  (eg. 0.5 means a 50/50 chance for a cell to be alive)" << endl;
+        cin >> aliveChance;
+
+        if (aliveChance >= PROB_MIN && aliveChance <= PROB_MAX) {
+            break;
+        }
+
+        cout << "Invalid input: The probability must be between 0 and 1." << endl;
+    }
+    
+    // Loop #randomPlayTimes times of random play iterations
+    for (int play = 0; play < randomPlayTimes; play++) {
+        // Randomize the board to a random state
+        randomizeBoard(aliveChance, board);
+        // Reset the years and stagnant years
+        years = 0;
+        stagnantYears = 0;
+
+        simulate(board, lastBoard, years, stagnantYears, false);
+        // TODO: Statistics thing
+    }
 }
 
 /**
@@ -489,18 +507,17 @@ void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& yea
         }
     }
 }
-
-void csvParse(string fileName, bool board[WIDTH][HEIGHT]) {
-
-   // 2D array to store the initial state of the Game of Life
-
-    // check if the file provieded by the user exists
+/**
+ * Parses an input Game of Life CSV file and loads it into the given board.
+ * @param fileName The name of the file to load.
+ * @param board The board to load the file into.
+*/
+void parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
+    // check if the file provided by the user exists
     ifstream checkFile(fileName);
 
     // if the file exists continue if not report out error message
-    if (checkFile.good() == true)
-    {
-
+    if (checkFile.good()) {
         // Open the CSV file for reading
         ifstream csvReader(fileName);
         string myText;
@@ -509,8 +526,7 @@ void csvParse(string fileName, bool board[WIDTH][HEIGHT]) {
         int fileLength = 0;
 
         // Process each line of the CSV file
-        while (getline(csvReader, myText) && fileLength <= HEIGHT)
-        {
+        while (getline(csvReader, myText) && fileLength <= HEIGHT) {
             // Parse the current line using a stringstream
             stringstream lineParser(myText);
 
@@ -521,23 +537,17 @@ void csvParse(string fileName, bool board[WIDTH][HEIGHT]) {
             bool valueError = false;
 
             // Process each value in the current line
-            while (lineParser.good() && fileLength <= (HEIGHT - 1))
-            {
-                string val;
+            while (lineParser.good() && fileLength <= (HEIGHT - 1)) {
+                string valueString;
                 // Get a value separated by a comma
-                getline(lineParser, val, ',');
+                getline(lineParser, valueString, ',');
 
                 // Check if the value is either 0 or 1 and update the game board storing info as a bool
-                if (stoi(val) == 0)
-                {
+                if (stoi(valueString) == 0) {
                     board[fileLength][lineLength] = false;
-                }
-                else if (stoi(val) == 1)
-                {
+                } else if (stoi(valueString) == 1) {
                     board[fileLength][lineLength] = true;
-                }
-                else
-                {
+                } else {
                     // Set an error flag if the value is not 0 or 1
                     valueError = true;
                     break;
@@ -548,13 +558,10 @@ void csvParse(string fileName, bool board[WIDTH][HEIGHT]) {
             }
 
             // Check for errors in the current line
-            if (valueError == true)
-            {
+            if (valueError == true) {
                 cout << "ERROR: Line " << fileLength << " character " << lineLength << " does not have a valid value of 0 or 1!";
                 break; // Exit the loop if an error is encountered
-            }
-            else if (lineLength != WIDTH)
-            {
+            } else if (lineLength != WIDTH) {
                 cout << "ERROR: Line " << fileLength << " does not have " << WIDTH << " values!";
                 break; // Exit the loop if the line length is incorrect
             }
@@ -562,15 +569,10 @@ void csvParse(string fileName, bool board[WIDTH][HEIGHT]) {
             // Move to the next line in the file
             fileLength++;
         }
-    }
-    else
-    {
-
+    } else {
         cout << "ERROR: File " << fileName << " does not exist!";
     }
 }
-
-
 
 /**
  * Simulates a single year of the Game of Life.
@@ -673,22 +675,15 @@ bool isBoardEmpty(bool board[WIDTH][HEIGHT]) {
 }
 
 //the function to initialize the board with random values based on user probability input
-void initializeRandomGrid (double userProbability, bool board[WIDTH][HEIGHT])
-{
-    //initialize random number generator
-    random_device myEngine;
-    //create a number between 0.0 and 1.0
-    uniform_real_distribution<double> randomNum(PROB_MIN, PROB_MAX);
+void randomizeBoard(double aliveChance, bool board[WIDTH][HEIGHT]) {
+    random_device randomEngine; // Random number engine
+    uniform_real_distribution<double> randomDouble(PROB_MIN, PROB_MAX); // Create a random double between PROB_MIN and PROB_MAX
 
-    for (int x = 0; x < WIDTH; ++x) 
-    {
-        for (int y = 0; y < HEIGHT; ++y) 
-        {
-            double cellResult = randomNum(myEngine);
-            board[x][y] = (cellResult < userProbability);
+    // Loop through each cell
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+            board[x][y] = (randomDouble(randomEngine) < aliveChance); // Set each cell to alive or dead based on the chance
         }
     }
 }
-
-
 /* #endregion */
