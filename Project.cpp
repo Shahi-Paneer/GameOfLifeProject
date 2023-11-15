@@ -754,7 +754,12 @@ bool isBoardEmpty(bool board[WIDTH][HEIGHT]) {
     return true;
 }
 
-//the function to initialize the board with random values based on user probability input
+
+/**
+ * Randomizes the board to a random state.
+ * @param aliveChance The chance that any given cell is alive, between 0 and 1.
+ * @param board The board to randomize.
+ */
 void randomizeBoard(double aliveChance, bool board[WIDTH][HEIGHT]) {
     random_device randomEngine; // Random number engine
     uniform_real_distribution<double> randomDouble(PROB_MIN, PROB_MAX); // Create a random double between PROB_MIN and PROB_MAX
