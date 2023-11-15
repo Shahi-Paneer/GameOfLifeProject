@@ -578,12 +578,10 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
         boardX = 0; // Reset the X position
 
+        string valueString; // Variable to store the current value
+        
         // Process each value in the current line
-        while (!error && boardX < WIDTH && lineParser.good()) {
-            string valueString;
-            // Get a value separated by a comma
-            getline(lineParser, valueString, ',');
-
+        while (!error && boardX < WIDTH && getline(lineParser, valueString, ',')) {
             // Check if the value is empty
             if (valueString.empty()) {
                 cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a value!";
