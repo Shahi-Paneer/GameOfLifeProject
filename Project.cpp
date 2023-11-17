@@ -193,7 +193,6 @@ int aliveCells(bool board[WIDTH][HEIGHT]);
  */
 void displayState(bool board[WIDTH][HEIGHT], int years, int stagnantYears, GameOfLifeState state);
 
-
 /**
  * Routine for random play.
  * The main function passes off the interactive control to this function.
@@ -215,6 +214,16 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
  */
 GameOfLifeState detectState(bool board[WIDTH][HEIGHT], int years, int stagnantYears);
 
+/**
+ * Creates a histogram file of the number of years each game played so far has taken.
+ * @param stats The statistics collector for the Game of Life.
+ */
+void outputHistogram(const Statistics& stats);
+
+/**
+ * Displays the statistics collected from the Game of Life.
+ */
+void displayStatistics(const Statistics& stats);
 /* #endregion */
 
 /* #region Main */
@@ -297,8 +306,7 @@ int main() {
                 break;
             } else if (choice == 4) {
                 // 4. Report summary statistics
-                cout << "  Reporting summary statistics..." << endl;
-                // TODO: Implement this
+                displayStatistics(stats);
                 break;
             } else if (choice == 5) {
                 // 5. Random play
@@ -306,10 +314,7 @@ int main() {
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
-                cout << "  Outputting histogram..." << endl;
                 outputHistogram(stats);
-                break;
-                // TODO: Implement this
                 break;
             } else if (choice == 7) {
                 // 7. Quit
@@ -776,49 +781,59 @@ void randomizeBoard(double aliveChance, bool board[WIDTH][HEIGHT]) {
         }
     }
 }
-/* #endregion */
 
+/**
+ * Creates a histogram file of the number of years each game played so far has taken.
+ * @param stats The statistics collector for the Game of Life.
+ */
+void outputHistogram(const Statistics& stats) {
+    const int maxHistogramSize = 101; //assume a maximum of 100 years
 
+    int histogram[maxHistogramSize] = {0}; //create an array to store the histogram data, initialized with all elements set to 0
 
-//output a histogram of how many years each game played so far has taken
-
-void outputHistogram(const Statistics& stats)
-{
     //find the maximum number of years played
     int maxYears = 0;
-    for (int years : stats.endYears)
-    {
+    for (int years : stats.endYears) {
         maxYears = max(maxYears, years);
-    }
-
-    //assume a maximum of 100 years
-    const int maxHistogramSize = 101;
-    //create an array to store the histogram data, initialized with all elements set to 0
-    int histogram[maxHistogramSize] = {0};
-
-    //count the occurrences of each number of years
-    for (int years : stats.endYears)
-    {
         histogram[years]++;
     }
 
     //output the histogram to a file
     ofstream histogramFile("results_histogram.txt");
-    if (histogramFile.is_open()) 
-    {
-        histogramFile << "Game of Life Results Histogram, Number of turns Taken:" << endl;
-        for (int index = 0; index <= maxYears && index < maxHistogramSize; index++) 
-        {
-            if (histogram[index] > 0) 
-            {
-                histogramFile << index << ": " << string(histogram[index], '*') << endl;
-            }
-        }
-        histogramFile.close();
-        cout << "Histogram saved to results_histogram.txt" << endl;
-    } 
-    else 
-    {
+    if (!histogramFile.is_open())  {
         cout << "Error: Unable to open histogram file for writing." << endl;
+        return;
     }
+
+    histogramFile << "Game of Life Results Histogram, Number of turns Taken:" << endl;
+    for (int index = 0; index <= maxYears && index < maxHistogramSize; index++) 
+    {
+        if (histogram[index] > 0) {
+            histogramFile << index << ": " << string(histogram[index], '*') << endl;
+        }
+    }
+    histogramFile.close();
+    cout << "Histogram saved to results_histogram.txt" << endl;
 }
+
+
+/**
+ * Displays the statistics collected from the Game of Life.
+ */
+void displayStatistics(const Statistics& stats) {
+    double averageAliveCells = (double)stats.totalAliveCells / stats.totalGames;
+    double averageYears = 0;
+    for (int years : stats.endYears) {
+        averageYears += years;
+    }
+    averageYears /= stats.endYears.size();
+
+    cout << "Summary Statistics:" << endl;
+    cout << "  Total games played: " << stats.totalGames << endl;
+    cout << "  Average number of alive cells: " << averageAliveCells << endl;
+    cout << "  Average number of years played: " << averageYears << endl;
+
+    pause();
+}
+
+/* #endregion */
