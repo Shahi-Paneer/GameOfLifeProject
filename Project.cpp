@@ -55,15 +55,15 @@ struct Statistics {
     */
     vector<int> endYears;
 
-    // NOTE: This part is not trivial for me (Anna) because the description is not clear enough.
-    // Ask the professor for clarification.
-    /*
-    Report of, on average, how many cells survive the game of life,
-    and how many years it takes, for every game played so far (including random play)
-    */
-   // Average at the end of each game? or at each year?
-   // How many cells survive from the beginning of the game? or at each year? or at the end of each game?
-   // Do we have to track % of total vs alive cells? or just the number of alive cells?
+    /**
+     * Games observed by the statistics collector.
+     */
+    int totalGames;
+
+    /**
+     * Accumulated sum of all alive cells in the end of all games observed by the statistics collector.
+     */
+    int totalAliveCells;
 };
 
 /**
@@ -385,7 +385,6 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
         stagnantYears = 0;
 
         simulate(board, lastBoard, years, stagnantYears, stats, false);
-        // TODO: Statistics thing
     }
 }
 
@@ -536,6 +535,7 @@ void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& yea
     // Display the last state, if interactive mode is enabled and the game is already over
     if (interactive && state != RUNNING) {
         displayState(board, years, stagnantYears, state);
+        // In this case, no statistics should be collected since no simulation was performed
         return;
     }
 
@@ -549,8 +549,13 @@ void simulate(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT], int& yea
         if (interactive) {
             displayState(board, years, stagnantYears, state);
         }
-        // TODO: Statistics thing
     }
+
+    // Game has ended
+    // Collect statistics
+    stats.endYears.push_back(years);
+    stats.totalGames++;
+    stats.totalAliveCells += aliveCells(board);
 }
 
 /**
