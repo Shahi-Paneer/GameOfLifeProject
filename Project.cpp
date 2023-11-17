@@ -576,7 +576,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
     if (!csvReader.good()) { // Check if the file exists
         cout << "ERROR: File " << fileName << " does not exist!";
-        return;
+        return false;
     }
 
     string csvLine; // Variable to store the current line of the CSV file
