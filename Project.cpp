@@ -20,6 +20,11 @@ const int WIDTH = 50;
  */
 const int HEIGHT = 50;
 
+/**
+*  Name of the CSV used for board setup.
+*/
+const string csvName = "initialSetup.csv";
+
 //declare constants for the probability
 const double PROB_MAX = 1.0; 
 const double PROB_MIN = 0.0; 
@@ -297,8 +302,8 @@ int main() {
                 break;
             } else if (choice == 2) {
                 // 2. Set state from CSV file
-                cout << "  Setting state from CSV file..." << endl;
-                // TODO: Implement this
+                cout << "  Setting state from CSV file... Please make sure the initialSetup.csv exists in the game folder." << endl;
+                parseCsv(csvName, board);
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
