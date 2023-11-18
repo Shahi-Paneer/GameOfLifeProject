@@ -392,6 +392,11 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
         stagnantYears = 0;
 
         simulate(board, lastBoard, years, stagnantYears, stats, false);
+
+        if (play != 0 & play % 40 == 0) {
+            clearScreen();
+            cout << "    " << play << " of " << randomPlayTimes << " random play iterations completed." << endl;
+        }
     }
 }
 
@@ -829,9 +834,9 @@ void displayStatistics(const Statistics& stats) {
     averageYears /= stats.endYears.size();
 
     cout << "Summary Statistics:" << endl;
-    cout << "  Total games played: " << stats.totalGames << endl;
-    cout << "  Average number of alive cells: " << averageAliveCells << endl;
-    cout << "  Average number of years played: " << averageYears << endl;
+    cout << "  Total games played: " << stats.totalGames << " games" << endl;
+    cout << "  Average number of alive cells: " << averageAliveCells << " of " << TOTAL_CELLS << " cells (" << averageAliveCells / TOTAL_CELLS * 100 << "%)" << endl;
+    cout << "  Average number of years played: " << averageYears << " years" << endl;
 
     pause();
 }
