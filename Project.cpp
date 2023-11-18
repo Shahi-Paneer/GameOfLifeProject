@@ -289,6 +289,7 @@ int main() {
             
             // Input handling
             cin >> choice;
+            cin.ignore(); // Ignore the newline character
             cout << endl;
 
             // Handle the user's choice
@@ -305,22 +306,18 @@ int main() {
             } else if (choice == 3) {
                 // 3. Play the Game of Life
                 simulate(board, lastBoard, years, stagnantYears, stats, true);
-                pause();
                 break;
             } else if (choice == 4) {
                 // 4. Report summary statistics
                 displayStatistics(stats);
-                pause();
                 break;
             } else if (choice == 5) {
                 // 5. Random play
                 randomPlayRoutine(board, lastBoard, years, stagnantYears, stats);
-                pause();
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
                 outputHistogram(stats);
-                pause();
                 break;
             } else if (choice == 7) {
                 // 7. Quit
@@ -366,6 +363,7 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
     while (true) {
         cout << "Please enter a number of times of random play to occur:" << endl;
         cin >> randomPlayTimes; // Read the input
+        cin.ignore(); // Ignore the newline character
 
         if (randomPlayTimes > 0) { // Input validation
             break;
@@ -379,6 +377,7 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
         cout << "Please enter a probability for a cell to be alive:" << endl;
         cout << "  (eg. 0.5 means a 50/50 chance for a cell to be alive)" << endl;
         cin >> aliveChance; // Read the input
+        cin.ignore(); // Ignore the newline character
 
         if (aliveChance >= PROB_MIN && aliveChance <= PROB_MAX) { // Input validation
             break;
@@ -408,9 +407,8 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
  * Pauses the program until the user presses Return.
  */
 void pause() {
-    cout << "Press any key to continue..." << flush;
-    cin.ignore(); // Ignores everything in the input buffer
-    cin.get(); // Waits for the user to press any key
+    cout << "Press return to continue..." << flush;
+    cin.ignore(); // Waits for return key
 }
 
 /**
@@ -586,7 +584,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
     ifstream csvReader(fileName); // Reader for the CSV file
 
     if (!csvReader.good()) { // Check if the file exists
-        cout << "ERROR: File " << fileName << " does not exist!";
+        cout << "ERROR: File " << fileName << " does not exist!" << endl;
         return false;
     }
     string csvLine; // Variable to store the current line of the CSV file
@@ -606,21 +604,21 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
         while (!error && boardX < WIDTH && getline(lineParser, valueString, ',')) {
             // Check if the value is empty
             if (valueString.empty()) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a value!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a value!" << endl;
                 error = true; // Set the error flag
                 break;
             }
 
             // Check if the value is longer than 1 character
             if (valueString.length() > 1) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") has a value longer than 1 character!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") has a value longer than 1 character!" << endl;
                 error = true; // Set the error flag
                 break;
             }
 
             // Check if the value is not a digit
             if (!isdigit(valueString[0])) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value!" << endl;
                 error = true; // Set the error flag
                 break;
             }
@@ -629,7 +627,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
             // Check if the value is not 0 or 1
             if (value != 0 && value != 1) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value of 0 or 1!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value of 0 or 1!" << endl;
                 error = true; // Set the error flag
                 break;
             }
@@ -641,7 +639,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
         // Check if not enough values were read in the line
         if (boardX != WIDTH) {
-            cout << "ERROR: Line " << boardY << " does not have " << WIDTH << " values!";
+            cout << "ERROR: Line " << boardY << " does not have " << WIDTH << " values!" << endl;
             error = true; // Set the error flag
             break;
         }
@@ -649,7 +647,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
         // Check if there are more values to be read in the line
         if (!lineParser.eof()) {
             // There are more values in the line than expected
-            cout << "ERROR: Line " << boardY << " has more than " << WIDTH << " values!";
+            cout << "ERROR: Line " << boardY << " has more than " << WIDTH << " values!" << endl;
             error = true; // Set the error flag
             break;
         }
@@ -660,14 +658,14 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
     // Check if not enough lines were read in the file
     if (boardY != HEIGHT) {
-        cout << "ERROR: File does not have " << HEIGHT << " lines!";
+        cout << "ERROR: File does not have " << HEIGHT << " lines!" << endl;
         error = true; // Set the error flag
     }
 
     // Check if there are more lines to be read in the file
     if (!csvReader.eof()) {
         // There are more lines in the file than expected
-        cout << "ERROR: File has more than " << HEIGHT << " lines!";
+        cout << "ERROR: File has more than " << HEIGHT << " lines!" << endl;
         error = true; // Set the error flag
     }
 
