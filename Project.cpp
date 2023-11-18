@@ -20,6 +20,11 @@ const int WIDTH = 50;
  */
 const int HEIGHT = 50;
 
+/**
+*  Name of the CSV used for board setup.
+*/
+const string csvName = "initialSetup.csv";
+
 //declare constants for the probability
 const double PROB_MAX = 1.0; 
 const double PROB_MIN = 0.0; 
@@ -297,8 +302,8 @@ int main() {
                 break;
             } else if (choice == 2) {
                 // 2. Set state from CSV file
-                cout << "  Setting state from CSV file..." << endl;
-                // TODO: Implement this
+                cout << "  Setting state from CSV file... Please make sure the initialSetup.csv exists in the game folder." << endl;
+                parseCsv(csvName, board);
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
@@ -392,6 +397,11 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
         stagnantYears = 0;
 
         simulate(board, lastBoard, years, stagnantYears, stats, false);
+
+        if (play != 0 & play % 40 == 0) {
+            clearScreen();
+            cout << "    " << play << " of " << randomPlayTimes << " random play iterations completed." << endl;
+        }
     }
 }
 
@@ -576,7 +586,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
     if (!csvReader.good()) { // Check if the file exists
         cout << "ERROR: File " << fileName << " does not exist!";
-        return;
+        return false;
     }
 
     string csvLine; // Variable to store the current line of the CSV file
@@ -829,9 +839,9 @@ void displayStatistics(const Statistics& stats) {
     averageYears /= stats.endYears.size();
 
     cout << "Summary Statistics:" << endl;
-    cout << "  Total games played: " << stats.totalGames << endl;
-    cout << "  Average number of alive cells: " << averageAliveCells << endl;
-    cout << "  Average number of years played: " << averageYears << endl;
+    cout << "  Total games played: " << stats.totalGames << " games" << endl;
+    cout << "  Average number of alive cells: " << averageAliveCells << " of " << TOTAL_CELLS << " cells (" << averageAliveCells / TOTAL_CELLS * 100 << "%)" << endl;
+    cout << "  Average number of years played: " << averageYears << " years" << endl;
 
     pause();
 }
