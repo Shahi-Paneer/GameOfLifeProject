@@ -96,7 +96,7 @@ enum GameOfLifeState {
 void clearScreen();
 
 /**
- * Pauses the program until the user presses any key.
+ * Pauses the program until the user presses Return.
  */
 void pause();
 
@@ -396,10 +396,10 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
 }
 
 /**
- * Pauses the program until the user presses any key.
+ * Pauses the program until the user presses Return.
  */
 void pause() {
-    cout << "Press any key to continue..." << flush;
+    cout << "Press RETURN to continue..." << flush;
     cin.ignore();
     cin.get();
 }
