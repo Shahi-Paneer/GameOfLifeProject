@@ -253,6 +253,8 @@ int main() {
 
     // Statistics collector for the Game of Life
     Statistics stats;
+    stats.totalGames = 0;
+    stats.totalAliveCells = 0;
 
     // Initialize the boards
     initializeBoard(board);
