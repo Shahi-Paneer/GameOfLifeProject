@@ -225,6 +225,9 @@ void outputHistogram(const Statistics& stats);
  * Displays the statistics collected from the Game of Life.
  */
 void displayStatistics(const Statistics& stats);
+
+void loadCsvRoutine(bool board[WIDTH][HEIGHT]);
+
 /* #endregion */
 
 /* #region Main */
@@ -301,9 +304,7 @@ int main() {
                 break;
             } else if (choice == 2) {
                 // 2. Set state from CSV file
-                cout << "  Setting state from CSV file... Please make sure initialSetup.csv exists in the game folder." << endl;
-                parseCsv(csvName, board); //Load CSV into gameboard
-                pause();
+                loadCsvRoutine(board);
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
@@ -824,6 +825,14 @@ void outputHistogram(const Statistics& stats) {
     }
     histogramFile.close();
     cout << "Histogram saved to results_histogram.txt" << endl;
+}
+
+void loadCsvRoutine(bool board[WIDTH][HEIGHT]){
+    cout << "  Setting state from CSV file... Please make sure initialSetup.csv exists in the game folder." << endl;
+    if (parseCsv(csvName, board)){
+        cout << "CSV file has been loaded succesfully." << endl;
+    } //Load CSV into gameboard
+    pause(); // call pause function so user can continue
 }
 
 
