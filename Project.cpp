@@ -229,6 +229,9 @@ void outputHistogram(const Statistics& stats);
  * Displays the statistics collected from the Game of Life.
  */
 void displayStatistics(const Statistics& stats);
+
+void loadCsvRoutine(bool board[WIDTH][HEIGHT]);
+
 /* #endregion */
 
 /* #region Main */
@@ -302,9 +305,7 @@ int main() {
                 break;
             } else if (choice == 2) {
                 // 2. Set state from CSV file
-                cout << "  Setting state from CSV file... Please make sure initialSetup.csv exists in the game folder." << endl;
-                parseCsv(csvName, board); //Load CSV into gameboard
-                pause();
+                loadCsvRoutine(board);
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
@@ -590,7 +591,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
     ifstream csvReader(fileName); // Reader for the CSV file
 
     if (!csvReader.good()) { // Check if the file exists
-        cout << "ERROR: File " << fileName << " does not exist!";
+        cout << "ERROR: File " << fileName << " does not exist!" << endl;
         return false;
     }
     string csvLine; // Variable to store the current line of the CSV file
@@ -610,21 +611,21 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
         while (!error && boardX < WIDTH && getline(lineParser, valueString, ',')) {
             // Check if the value is empty
             if (valueString.empty()) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a value!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a value!" << endl;
                 error = true; // Set the error flag
                 break;
             }
 
             // Check if the value is longer than 1 character
             if (valueString.length() > 1) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") has a value longer than 1 character!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") has a value longer than 1 character!" << endl;
                 error = true; // Set the error flag
                 break;
             }
 
             // Check if the value is not a digit
             if (!isdigit(valueString[0])) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value!" << endl;
                 error = true; // Set the error flag
                 break;
             }
@@ -633,7 +634,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
             // Check if the value is not 0 or 1
             if (value != 0 && value != 1) {
-                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value of 0 or 1!";
+                cout << "ERROR: Cell (" << boardX << ", " << boardY << ") does not have a valid value of 0 or 1!" << endl;
                 error = true; // Set the error flag
                 break;
             }
@@ -645,7 +646,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
         // Check if not enough values were read in the line
         if (boardX != WIDTH) {
-            cout << "ERROR: Line " << boardY << " does not have " << WIDTH << " values!";
+            cout << "ERROR: Line " << boardY << " does not have " << WIDTH << " values!" << endl;
             error = true; // Set the error flag
             break;
         }
@@ -653,7 +654,7 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
         // Check if there are more values to be read in the line
         if (!lineParser.eof()) {
             // There are more values in the line than expected
-            cout << "ERROR: Line " << boardY << " has more than " << WIDTH << " values!";
+            cout << "ERROR: Line " << boardY << " has more than " << WIDTH << " values!" << endl;
             error = true; // Set the error flag
             break;
         }
@@ -664,14 +665,14 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
     // Check if not enough lines were read in the file
     if (boardY != HEIGHT) {
-        cout << "ERROR: File does not have " << HEIGHT << " lines!";
+        cout << "ERROR: File does not have " << HEIGHT << " lines!" << endl;
         error = true; // Set the error flag
     }
 
     // Check if there are more lines to be read in the file
     if (!csvReader.eof()) {
         // There are more lines in the file than expected
-        cout << "ERROR: File has more than " << HEIGHT << " lines!";
+        cout << "ERROR: File has more than " << HEIGHT << " lines!" << endl;
         error = true; // Set the error flag
     }
 
@@ -828,6 +829,14 @@ void outputHistogram(const Statistics& stats) {
     }
     histogramFile.close();
     cout << "Histogram saved to results_histogram.txt" << endl;
+}
+
+void loadCsvRoutine(bool board[WIDTH][HEIGHT]){
+    cout << "  Setting state from CSV file... Please make sure initialSetup.csv exists in the game folder." << endl;
+    if (parseCsv(csvName, board)){
+        cout << "CSV file has been loaded succesfully." << endl;
+    } //Load CSV into gameboard
+    pause(); // call pause function so user can continue
 }
 
 
