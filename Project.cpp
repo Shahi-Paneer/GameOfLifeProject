@@ -46,10 +46,6 @@ const int MAX_STAGNANT_YEARS = 20;
 /* #endregion */
 
 /* #region Structs and Enums */
-
-// NOTE: I (Anna) used this struct because we will need to extract a lot of data
-// in a lot of different places, and it will be easier to do that if we have a
-// struct to centralize all of the data.
 /**
  * Statistics collector for the Game of Life.
  * Used to store statistics for each game played.
@@ -296,6 +292,7 @@ int main() {
             
             // Input handling
             cin >> choice;
+            cin.ignore(); // Ignore the newline character
             cout << endl;
 
             // Handle the user's choice
@@ -310,22 +307,18 @@ int main() {
             } else if (choice == 3) {
                 // 3. Play the Game of Life
                 simulate(board, lastBoard, years, stagnantYears, stats, true);
-                pause();
                 break;
             } else if (choice == 4) {
                 // 4. Report summary statistics
                 displayStatistics(stats);
-                pause();
                 break;
             } else if (choice == 5) {
                 // 5. Random play
                 randomPlayRoutine(board, lastBoard, years, stagnantYears, stats);
-                pause();
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
                 outputHistogram(stats);
-                pause();
                 break;
             } else if (choice == 7) {
                 // 7. Quit
@@ -370,9 +363,10 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
     // Prompt the user for input
     while (true) {
         cout << "Please enter a number of times of random play to occur:" << endl;
-        cin >> randomPlayTimes;
+        cin >> randomPlayTimes; // Read the input
+        cin.ignore(); // Ignore the newline character
 
-        if (randomPlayTimes > 0) {
+        if (randomPlayTimes > 0) { // Input validation
             break;
         }
 
@@ -381,13 +375,12 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
     
     // Prompt the user for input
     while (true) {
-        // cout << "Please enter a probability for a cell to be alive," << endl;
-        // cout << "e.g. 0.5 to say that each cell has a 50/50 shot to start as alive. " ;
         cout << "Please enter a probability for a cell to be alive:" << endl;
         cout << "  (eg. 0.5 means a 50/50 chance for a cell to be alive)" << endl;
-        cin >> aliveChance;
+        cin >> aliveChance; // Read the input
+        cin.ignore(); // Ignore the newline character
 
-        if (aliveChance >= PROB_MIN && aliveChance <= PROB_MAX) {
+        if (aliveChance >= PROB_MIN && aliveChance <= PROB_MAX) { // Input validation
             break;
         }
 
@@ -404,7 +397,7 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
 
         simulate(board, lastBoard, years, stagnantYears, stats, false);
 
-        if (play != 0 & play % 40 == 0) {
+        if (play != 0 && play % 40 == 0 && play != randomPlayTimes - 1) {
             clearScreen();
             cout << "    " << play << " of " << randomPlayTimes << " random play iterations completed." << endl;
         }
@@ -415,9 +408,8 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
  * Pauses the program until the user presses Return.
  */
 void pause() {
-    cout << "Press RETURN to continue..." << flush;
-    cin.ignore();
-    cin.get();
+    cout << "Press return to continue..." << flush;
+    cin.ignore(); // Waits for return key
 }
 
 /**
@@ -453,9 +445,11 @@ void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]) {
  * @param years The current year.
  */
 void clearInput(bool board[WIDTH][HEIGHT], int& years) {
+    // Reset the board and years
     initializeBoard(board);
     years = 0;
 
+    // Display the new state
     clearScreen();
     cout << "  Input cleared." << endl;
     drawBoard(board);

@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "ostream": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+<<<<<<< HEAD
+        "xlocale": "cpp"
+=======
+        "iostream": "cpp"
+>>>>>>> 4528fa099483f3eb3e6c18bdc1d97c661aa389ab
     }
 }

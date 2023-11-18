@@ -1,2 +1,2 @@
 Game of Life Results Histogram, Number of turns Taken:
-100: *****
+2: **********
