@@ -46,10 +46,6 @@ const int MAX_STAGNANT_YEARS = 20;
 /* #endregion */
 
 /* #region Structs and Enums */
-
-// NOTE: I (Anna) used this struct because we will need to extract a lot of data
-// in a lot of different places, and it will be easier to do that if we have a
-// struct to centralize all of the data.
 /**
  * Statistics collector for the Game of Life.
  * Used to store statistics for each game played.
@@ -364,9 +360,9 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
     // Prompt the user for input
     while (true) {
         cout << "Please enter a number of times of random play to occur:" << endl;
-        cin >> randomPlayTimes;
+        cin >> randomPlayTimes; // Read the input
 
-        if (randomPlayTimes > 0) {
+        if (randomPlayTimes > 0) { // Input validation
             break;
         }
 
@@ -375,13 +371,11 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
     
     // Prompt the user for input
     while (true) {
-        // cout << "Please enter a probability for a cell to be alive," << endl;
-        // cout << "e.g. 0.5 to say that each cell has a 50/50 shot to start as alive. " ;
         cout << "Please enter a probability for a cell to be alive:" << endl;
         cout << "  (eg. 0.5 means a 50/50 chance for a cell to be alive)" << endl;
-        cin >> aliveChance;
+        cin >> aliveChance; // Read the input
 
-        if (aliveChance >= PROB_MIN && aliveChance <= PROB_MAX) {
+        if (aliveChance >= PROB_MIN && aliveChance <= PROB_MAX) { // Input validation
             break;
         }
 
@@ -398,7 +392,7 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
 
         simulate(board, lastBoard, years, stagnantYears, stats, false);
 
-        if (play != 0 & play % 40 == 0) {
+        if (play != 0 && play % 40 == 0 && play != randomPlayTimes - 1) {
             clearScreen();
             cout << "    " << play << " of " << randomPlayTimes << " random play iterations completed." << endl;
         }
@@ -410,8 +404,8 @@ void randomPlayRoutine(bool board[WIDTH][HEIGHT], bool lastBoard[WIDTH][HEIGHT],
  */
 void pause() {
     cout << "Press any key to continue..." << flush;
-    cin.ignore();
-    cin.get();
+    cin.ignore(); // Ignores everything in the input buffer
+    cin.get(); // Waits for the user to press any key
 }
 
 /**
@@ -447,9 +441,11 @@ void copyBoard(bool from[WIDTH][HEIGHT], bool to[WIDTH][HEIGHT]) {
  * @param years The current year.
  */
 void clearInput(bool board[WIDTH][HEIGHT], int& years) {
+    // Reset the board and years
     initializeBoard(board);
     years = 0;
 
+    // Display the new state
     clearScreen();
     cout << "  Input cleared." << endl;
     drawBoard(board);
