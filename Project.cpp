@@ -302,24 +302,29 @@ int main() {
                 break;
             } else if (choice == 2) {
                 // 2. Set state from CSV file
-                cout << "  Setting state from CSV file... Please make sure the initialSetup.csv exists in the game folder." << endl;
-                parseCsv(csvName, board);
+                cout << "  Setting state from CSV file... Please make sure initialSetup.csv exists in the game folder." << endl;
+                parseCsv(csvName, board); //Load CSV into gameboard
+                pause();
                 break;
             } else if (choice == 3) {
                 // 3. Play the Game of Life
                 simulate(board, lastBoard, years, stagnantYears, stats, true);
+                pause();
                 break;
             } else if (choice == 4) {
                 // 4. Report summary statistics
                 displayStatistics(stats);
+                pause();
                 break;
             } else if (choice == 5) {
                 // 5. Random play
                 randomPlayRoutine(board, lastBoard, years, stagnantYears, stats);
+                pause();
                 break;
             } else if (choice == 6) {
                 // 6. Output histogram
                 outputHistogram(stats);
+                pause();
                 break;
             } else if (choice == 7) {
                 // 7. Quit
@@ -581,9 +586,8 @@ bool parseCsv(string fileName, bool board[WIDTH][HEIGHT]) {
 
     if (!csvReader.good()) { // Check if the file exists
         cout << "ERROR: File " << fileName << " does not exist!";
-        return;
+        return false;
     }
-
     string csvLine; // Variable to store the current line of the CSV file
     int boardX = 0, boardY = 0; // Variables to track the current position on the board
     bool error = false; // Flag to indicate if there's an error in the file
